@@ -1,0 +1,109 @@
+Esboço Streamlit
+
+
+Assinar o tópico MQTT do seu ESP32
+
+Receber os dados JSON do sensor BMP280
+
+Exibir os dados em tempo real em uma dashboard interativa
+
+🛠️ Requisitos
+
+Antes, você precisa instalar alguns pacotes no seu ambiente Python:
+
+pip install streamlit paho-mqtt
+
+📄 Estrutura do projeto
+
+Crie um arquivo chamado, por exemplo:
+dashboard_bmp280.py
+
+✅ Código Python com Streamlit + MQTT
+import streamlit as st
+import paho.mqtt.client as mqtt
+import json
+from datetime import datetime
+
+# Dados recebidos
+temperaturas = []
+pressoes = []
+tempos = []
+
+# Configurações do broker MQTT (local)
+MQTT_BROKER = "localhost"  # ou "192.168.0.100" se rodar em outro PC
+MQTT_PORT = 1883
+MQTT_TOPIC = "sensor/bmp280"
+
+# --- Função chamada quando recebe mensagem MQTT ---
+def on_message(client, userdata, msg):
+    try:
+        data = json.loads(msg.payload.decode())
+        temperatura = data.get("temperatura")
+        pressao = data.get("pressao")
+        agora = datetime.now().strftime("%H:%M:%S")
+
+        if temperatura and pressao:
+            temperaturas.append(temperatura)
+            pressoes.append(pressao)
+            tempos.append(agora)
+
+            # Limita o tamanho das listas para manter leve
+            if len(tempos) > 100:
+                temperaturas.pop(0)
+                pressoes.pop(0)
+                tempos.pop(0)
+    except Exception as e:
+        print(f"Erro ao processar mensagem: {e}")
+
+# --- Configura e conecta MQTT ---
+client = mqtt.Client()
+client.on_message = on_message
+client.connect(MQTT_BROKER, MQTT_PORT, 60)
+client.subscribe(MQTT_TOPIC)
+client.loop_start()
+
+# --- Interface do Streamlit ---
+st.set_page_config(page_title="Monitor BMP280", layout="wide")
+st.title("📡 Dashboard BMP280 via MQTT")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("🌡️ Temperatura (°C)", temperaturas[-1] if temperaturas else "—")
+with col2:
+    st.metric("🧭 Pressão (hPa)", pressoes[-1] if pressoes else "—")
+
+st.line_chart(
+    data={
+        "Temperatura (°C)": temperaturas,
+        "Pressão (hPa)": pressoes,
+    },
+    x=tempos
+)
+
+# Atualiza a cada 2 segundos
+st.experimental_rerun()
+
+▶️ Como rodar
+
+Com o Mosquitto rodando e o ESP32 publicando, execute:
+
+streamlit run dashboard_bmp280.py
+
+
+O Streamlit abrirá no navegador (geralmente em http://localhost:8501) e você verá:
+
+Métricas em tempo real
+
+Gráficos dinâmicos de temperatura e pressão
+
+🧠 Dicas finais
+
+Se o broker estiver em outro PC → altere "localhost" para o IP dele.
+
+Se os dados não aparecerem:
+
+Verifique se o ESP está conectado corretamente
+
+Use mosquitto_sub para garantir que está enviando ao tópico certo
+
+O gráfico vai acumulando os dados. Para limitar histórico, ajuste os .pop(0) ou use pandas com janela de tempo.
