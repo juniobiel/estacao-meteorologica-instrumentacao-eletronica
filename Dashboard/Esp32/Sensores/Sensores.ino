@@ -51,7 +51,7 @@ const unsigned long TEMP_INTERVAL = 30000;
 const unsigned long TEMP_AVG_INTERVAL = 180000;
 const unsigned long HUMIDITY_INTERVAL = 300000;
 const unsigned long WIND_CALC_INTERVAL = 30000;
-const unsigned long WIND_SEND_INTERVAL = 300000;
+const unsigned long WIND_SEND_INTERVAL = 30000;
 const unsigned long DIRECTION_INTERVAL = 300000;
 
 unsigned long lastLux = 0;
@@ -198,11 +198,11 @@ void loop() {
     if (isnan(lastPressureVal)) {
       Serial.printf("[BMP280] Primeira leitura pressão: %.2f hPa\n", p);
       lastPressureVal = p;
-      sendToMQTT("Pressão", p, "hPa");
+      sendToMQTT("Pressao", p, "hPa");
     } else if (abs(p - lastPressureVal) > 30 && p >= 800 && p <= 1060) {
-      Serial.printf("[BMP280] Variação detectada pressão: %.2f hPa\n", p);
+      Serial.printf("[BMP280] Variação detectada pressao: %.2f hPa\n", p);
       lastPressureVal = p;
-      sendToMQTT("Pressão", p, "hPa");
+      sendToMQTT("Pressao", p, "hPa");
     }
   }
 
@@ -230,7 +230,7 @@ void loop() {
   if (now - lastHumidity >= HUMIDITY_INTERVAL) {
     lastHumidity = now;
     float h = dht.getHumidity();
-    if (!isnan(h) && h >= 20 && h <= 90) {
+    if (!isnan(h) && h >= 0 && h <= 90) {
       h = round(h / 5.0) * 5;
       if (isnan(lastHumidityVal)) {
         Serial.printf("[DHTesp] Primeira leitura: %.0f%%\n", h);
