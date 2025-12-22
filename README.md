@@ -11,8 +11,8 @@ Sensor de Direção - Sensor de Ângulo AS5600.
 
 
 - [x] Construir os códigos de leitura na plataforma Arduíno.
-- [ ] Instalação do servidor MQTT para comunicação com ESP32.
-- [ ] Fazer a comunicação com servidor de 1 dos sensores.
-- [ ] Inclui o restante dos sensores e garante a propagação dos dados.
-- [ ] Plotagem dos dados e organização em dashboard.
-- [ ] Validar quais precisam de filtros de suaviação e etc.
+- [x] Instalação do servidor MQTT para comunicação com ESP32.
+- [x] Fazer a comunicação com servidor de 1 dos sensores.
+- [x] Inclui o restante dos sensores e garante a propagação dos dados.
+- [x] Plotagem dos dados e organização em dashboard.
+- [x] Validar quais precisam de filtros de suaviação e etc.
